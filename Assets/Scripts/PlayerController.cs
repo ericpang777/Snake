@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     public GameObject Pickup;
     public GameObject SnakeBody;
     public Text ScoreText;
-
+    
     private Rigidbody snakeHead;
     private float moveVert; 
     private float moveHoriz;
@@ -28,10 +28,12 @@ public class PlayerController : MonoBehaviour
     //The two values under are to prevent button spam
     private bool justTurned;
     private float keyDelay;
+    private GameObject lastBody;
     private int score;
 
     void Start()
     {
+        lastBody = SnakeBody;
         snakeHead = GetComponent<Rigidbody>();
         snakeHead.freezeRotation = true;
         lastDirec = 0;
@@ -40,7 +42,7 @@ public class PlayerController : MonoBehaviour
 
         //Values of moveVert and moveHoriz and rotation when turning to a new direction
         //From north, east, south, west
-        direcValues = new int[4, 3] { { 1, 0, 45 }, { 0, 1, 135 }, { -1, 0, 225 }, { 0, -1, 315 } };
+        direcValues = new int[4, 3] {{1, 0, 45}, {0, 1, 135}, {-1, 0, 225}, {0, -1, 315}};
         Turn(lastDirec);
         justTurned = false;
     }
@@ -55,7 +57,7 @@ public class PlayerController : MonoBehaviour
                 lastDirec--;
                 Turn(lastDirec);
             }
-            if (Input.GetKeyDown(KeyCode.D))
+            else if (Input.GetKeyDown(KeyCode.D))
             {
                 lastDirec++;
                 Turn(lastDirec);
@@ -69,7 +71,7 @@ public class PlayerController : MonoBehaviour
         {
             keyDelay -= Time.deltaTime;
         }
-        if (keyDelay < 0)
+        else
         {
             keyDelay = 0;
             justTurned = false;
@@ -78,7 +80,7 @@ public class PlayerController : MonoBehaviour
 
     private void Turn(int lastDirec)
     {
-        keyDelay = 0.3f; //0.3 seconds of delay
+        keyDelay = 0.25f; //0.25 seconds of delay
         justTurned = true;
 
         lastTurnPos = snakeHead.transform.position;
@@ -99,21 +101,45 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Pickup"))
         {
-            //Spawn pickup
             other.gameObject.SetActive(false);
-            Vector3 spawnPos = GenPosition();
-            GameObject newPickup = (GameObject)Instantiate(Pickup, spawnPos, Quaternion.identity);
-            newPickup.SetActive(true);
-
-            //Spawn new body part
-            spawnPos = new Vector3(0f, 0f, 0f);
-            GameObject newBody = (GameObject)Instantiate(SnakeBody, spawnPos, Quaternion.identity);
-            newBody.SetActive(true);
-            newBody.transform.Rotate(new Vector3(0, 45, 0));
+            SpawnBody();
+            SpawnPickup();
 
             score++;
             SetCounterText();
         }
+    }
+
+    private void SpawnBody()
+    {
+        //Spawn new body part
+        //Spawn distances also from north east south west
+        float[,] spawnDistances = new float[4, 2] {{0f, -1.3f}, {-1.3f, 0f}, {0f, 1.3f}, {1.3f, 0f}};
+        int lastDirection = lastBody.GetComponent<BodyController>().LastDirec;
+
+        float x = lastBody.transform.position.x + spawnDistances[lastDirection, 0];
+        float z = lastBody.transform.position.z + spawnDistances[lastDirection, 1];
+        //Y value will always stay as 0.4
+        Vector3 spawnPos = new Vector3(x, 0.4f, z);
+        GameObject newBody = (GameObject)Instantiate(SnakeBody, spawnPos, Quaternion.identity);
+        newBody.SetActive(true);
+        newBody.transform.Rotate(new Vector3(0, 45, 0));
+        newBody.GetComponent<BodyController>().LastDirec = lastDirection;
+        lastBody = newBody;
+    }
+
+    private void SpawnPickup()
+    {
+        //Spawn pickup
+        //Check for other objects in range of spawning position
+        Vector3 spawnPos;
+        do
+        {
+            spawnPos = GenPosition();
+        } while (Physics.CheckSphere(spawnPos, 1f));
+
+        GameObject newPickup = (GameObject)Instantiate(Pickup, spawnPos, Quaternion.identity);
+        newPickup.SetActive(true);
     }
 
     private Vector3 GenPosition()

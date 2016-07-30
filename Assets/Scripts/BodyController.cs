@@ -14,8 +14,14 @@ public class BodyController : MonoBehaviour
     private int[,] direcValues;
     //Last direction snake was going
     private int lastDirec;
-    private Vector3 currentPos;
+    public int LastDirec
+    {
+        get { return lastDirec; }
+        set { lastDirec = value; }
+    }
+    //Last turn position
     private Vector3 lastTurnPos;
+    private Vector3 currentPos;
 
     void Start () {
         snakeBody = GetComponent<Rigidbody>();
