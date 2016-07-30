@@ -44,10 +44,10 @@ public class BodyController : MonoBehaviour
 
     Vector3 Round(Vector3 v3)
     {
-        //Rounds to nearest fifth
-        float x = Mathf.Round(v3.x * 10f) / 10;
-        float y = Mathf.Round(v3.y * 10f) / 10;
-        float z = Mathf.Round(v3.z * 10f) / 10;
+        //Rounds to nearest hundredth
+        float x = Mathf.Round(v3.x * 100f) / 100;
+        float y = Mathf.Round(v3.y * 100f) / 100;
+        float z = Mathf.Round(v3.z * 100f) / 100;
         return new Vector3(x, y, z);
     }
 
