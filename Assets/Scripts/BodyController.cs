@@ -14,8 +14,8 @@ public class BodyController : MonoBehaviour
     private int[,] direcValues;
     //Last direction snake was going
     private int lastDirec;
-    public Vector3 currentPos;
-    public Vector3 lastTurnPos;
+    private Vector3 currentPos;
+    private Vector3 lastTurnPos;
 
     void Start () {
         snakeBody = GetComponent<Rigidbody>();
@@ -35,14 +35,14 @@ public class BodyController : MonoBehaviour
 	    lastTurnPos = Round(lastTurnPos);
 	    currentPos = snakeBody.transform.position;
 	    currentPos = Round(currentPos);
-	    if(currentPos.Equals(lastTurnPos))
+	    if (currentPos.Equals(lastTurnPos))
         {
             lastDirec = playControl.LastDirec;
             TurnTo(lastDirec);
         }
 	}
 
-    Vector3 Round(Vector3 v3)
+    private Vector3 Round(Vector3 v3)
     {
         //Rounds to nearest hundredth
         float x = Mathf.Round(v3.x * 100f) / 100;
@@ -51,7 +51,7 @@ public class BodyController : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
-    void TurnTo(int lastDirec)
+    private void TurnTo(int lastDirec)
     {
         this.lastDirec = lastDirec + 4;
         this.lastDirec %= 4;

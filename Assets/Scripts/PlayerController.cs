@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour
     {
         get { return lastTurnPos; }
     }
+    //The two values under are to prevent button spam
+    private bool justTurned;
+    private float keyDelay;
     private int score;
 
     void Start()
@@ -38,23 +41,46 @@ public class PlayerController : MonoBehaviour
         //Values of moveVert and moveHoriz and rotation when turning to a new direction
         //From north, east, south, west
         direcValues = new int[4, 3] { { 1, 0, 45 }, { 0, 1, 135 }, { -1, 0, 225 }, { 0, -1, 315 } };
-        TurnTo(lastDirec);
+        Turn(lastDirec);
+        justTurned = false;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A)) {
-            lastDirec--;
-            TurnTo(lastDirec);
-        }
-        if (Input.GetKeyDown(KeyCode.D)) {
-            lastDirec++;
-            TurnTo(lastDirec);
+        ResetTimer();
+        if (!justTurned)
+        {
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                lastDirec--;
+                Turn(lastDirec);
+            }
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                lastDirec++;
+                Turn(lastDirec);
+            }
         }
     }
 
-    void TurnTo(int lastDirec)
+    private void ResetTimer()
     {
+        if (keyDelay > 0)
+        {
+            keyDelay -= Time.deltaTime;
+        }
+        if (keyDelay < 0)
+        {
+            keyDelay = 0;
+            justTurned = false;
+        }
+    }
+
+    private void Turn(int lastDirec)
+    {
+        keyDelay = 0.3f; //0.3 seconds of delay
+        justTurned = true;
+
         lastTurnPos = snakeHead.transform.position;
         this.lastDirec = lastDirec + 4;
         this.lastDirec %= 4;
@@ -71,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(other.gameObject.CompareTag("Pickup"))
+        if (other.gameObject.CompareTag("Pickup"))
         {
             //Spawn pickup
             other.gameObject.SetActive(false);
@@ -90,7 +116,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    Vector3 GenPosition()
+    private Vector3 GenPosition()
     {
         int x = Random.Range(-9, 10);
         float y = 0.5f;
@@ -98,7 +124,7 @@ public class PlayerController : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
-    void SetCounterText()
+    private void SetCounterText()
     {
         ScoreText.text = "Score: " + score;
     }
