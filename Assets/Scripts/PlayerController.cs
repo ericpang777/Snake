@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed;
-    public GameObject pickup;
-    public GameObject snakeBody;
-    public Text scoreText;
+    public float Speed;
+    public GameObject Pickup;
+    public GameObject SnakeBody;
+    public Text ScoreText;
 
     private Rigidbody snakeHead;
     private float moveVert; 
@@ -39,22 +38,22 @@ public class PlayerController : MonoBehaviour
         //Values of moveVert and moveHoriz and rotation when turning to a new direction
         //From north, east, south, west
         direcValues = new int[4, 3] { { 1, 0, 45 }, { 0, 1, 135 }, { -1, 0, 225 }, { 0, -1, 315 } };
-        turnTo(lastDirec);
+        TurnTo(lastDirec);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.A)) {
             lastDirec--;
-            turnTo(lastDirec);
+            TurnTo(lastDirec);
         }
         if (Input.GetKeyDown(KeyCode.D)) {
             lastDirec++;
-            turnTo(lastDirec);
+            TurnTo(lastDirec);
         }
     }
 
-    void turnTo(int lastDirec)
+    void TurnTo(int lastDirec)
     {
         lastTurnPos = snakeHead.transform.position;
         this.lastDirec = lastDirec + 4;
@@ -67,20 +66,22 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 movement = new Vector3(moveHoriz, 0.0f, moveVert);
-        snakeHead.velocity = movement * speed;
+        snakeHead.velocity = movement * Speed;
     }
 
     void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.CompareTag("Pickup"))
         {
+            //Spawn pickup
             other.gameObject.SetActive(false);
             Vector3 spawnPos = GenPosition();
-            GameObject newPickup = (GameObject)Instantiate(pickup, spawnPos, Quaternion.identity);
+            GameObject newPickup = (GameObject)Instantiate(Pickup, spawnPos, Quaternion.identity);
             newPickup.SetActive(true);
 
+            //Spawn new body part
             spawnPos = new Vector3(0f, 0f, 0f);
-            GameObject newBody = (GameObject)Instantiate(snakeBody, spawnPos, Quaternion.identity);
+            GameObject newBody = (GameObject)Instantiate(SnakeBody, spawnPos, Quaternion.identity);
             newBody.SetActive(true);
             newBody.transform.Rotate(new Vector3(0, 45, 0));
 
@@ -99,11 +100,6 @@ public class PlayerController : MonoBehaviour
 
     void SetCounterText()
     {
-        scoreText.text = "Score: " + score.ToString();
-    }
-
-    public int GetLastDirec()
-    {
-        return lastDirec;
+        ScoreText.text = "Score: " + score;
     }
 }
