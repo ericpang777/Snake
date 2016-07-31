@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections;
 using UnityEngine;
 
 public class BodyController : MonoBehaviour
@@ -19,8 +19,8 @@ public class BodyController : MonoBehaviour
         get { return lastDirec; }
         set { lastDirec = value; }
     }
-    //Last turn position
-    private Vector3 lastTurnPos;
+    //Last turn positions
+    private ArrayList lastTurnPositions;
     private Vector3 currentPos;
 
     void Start () {
@@ -28,23 +28,38 @@ public class BodyController : MonoBehaviour
         snakeBody.freezeRotation = true;
         playControl = SnakeHead.GetComponent<PlayerController>();
         lastDirec = playControl.LastDirec;
+        lastTurnPositions = new ArrayList();
 
         //Values of moveVert and moveHoriz and rotation when turning to a new direction
         //From north, east, south, west
         direcValues = new int[4, 2] { { 1, 0 }, { 0, 1 }, { -1, 0 }, { 0, -1 } };
-        TurnTo(lastDirec);
+        Turn(lastDirec);
     }
 	
 	void Update ()
 	{
-	    lastTurnPos = playControl.LastTurnPos;
-	    lastTurnPos = Round(lastTurnPos);
+        
+	    Vector3 lastTurnPos = Round(playControl.LastTurnPos);
+        //Check if arraylist already contains vector3
+	    if (!lastTurnPositions.Contains(lastTurnPos))
+	    {
+	        lastTurnPositions.Add(lastTurnPos);
+	    }
 	    currentPos = snakeBody.transform.position;
 	    currentPos = Round(currentPos);
+	    lastTurnPos = (Vector3)lastTurnPositions[1];
+        Debug.Log(currentPos + "current");
+	    foreach (var v in lastTurnPositions)
+	    {
+	        Debug.Log(v + "last");
+	    }
 	    if (currentPos.Equals(lastTurnPos))
         {
             lastDirec = playControl.LastDirec;
-            TurnTo(lastDirec);
+            Turn(lastDirec);
+            if(lastTurnPositions.Count > 1) { 
+                lastTurnPositions.RemoveAt(0);
+            }
         }
 	}
 
@@ -57,7 +72,7 @@ public class BodyController : MonoBehaviour
         return new Vector3(x, y, z);
     }
 
-    private void TurnTo(int lastDirec)
+    private void Turn(int lastDirec)
     {
         this.lastDirec = lastDirec + 4;
         this.lastDirec %= 4;

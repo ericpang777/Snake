@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //Countdown of key press delay
     private void ResetTimer()
     {
         if (keyDelay > 0)
@@ -80,7 +81,7 @@ public class PlayerController : MonoBehaviour
 
     private void Turn(int lastDirec)
     {
-        keyDelay = 0.25f; //0.25 seconds of delay
+        keyDelay = 0.26f; //0.26 seconds of delay
         justTurned = true;
 
         lastTurnPos = snakeHead.transform.position;
